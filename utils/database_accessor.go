@@ -1,7 +1,7 @@
 package utils
 
 import (
-	"github.com/gin-gonic/gin"
+	// "github.com/gin-gonic/gin"
 	"gopkg.in/mgo.v2"
 	// "net/http"
 )
@@ -22,10 +22,16 @@ func NewDatabaseAccessor(url, name, key string) *DatabaseAccessor {
 	if err != nil {
 		panic(err)
 	}
-	session.DB(name).C("user").EnsureIndex(mgo.Index{Key: []string{"user_email", "user_phone"}})
+	// session.DB(name).C("user").EnsureIndex(mgo.Index{Key: []string{"user_email", "user_phone"}})
 	return &DatabaseAccessor{session, url, name, key}
 }
 
+//Givedb : Function to return db
+func (d *DatabaseAccessor) Givedb() *mgo.Database {
+	return d.Session.DB("App")
+}
+
+/*
 //Get : To keep track of db and request
 func (d *DatabaseAccessor) Get(c *gin.Context) *mgo.Database {
 	if returnValue, _ := c.Get(d.key); returnValue != nil {
@@ -33,3 +39,4 @@ func (d *DatabaseAccessor) Get(c *gin.Context) *mgo.Database {
 	}
 	return nil
 }
+*/

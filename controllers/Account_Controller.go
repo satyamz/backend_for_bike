@@ -33,7 +33,8 @@ func (ac *AccountController) Register(router *gin.Engine) {
 //FindOrCreateUser : While signing up
 func (ac *AccountController) signup(c *gin.Context) {
 	// user := new(models.User)
-	db := ac.database.Get(c)
+	// db := ac.database.Get(c)
+	db := ac.database.Givedb()
 	userName := c.PostForm("name")
 	userEmail := c.PostForm("email")
 	userPhoneNumber := c.PostForm("phone")
