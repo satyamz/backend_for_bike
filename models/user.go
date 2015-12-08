@@ -12,7 +12,7 @@ type User struct {
 	ID            bson.ObjectId `bson:"_id,omitempty"`
 	Name          string        `bson:"user_name"`
 	Email         string        `bson:"user_email"`
-	PhoneNumber   int64         `bson:"phone_number"`
+	PhoneNumber   string        `bson:"phone_number"`
 	GoogleToken   string        `bson:"google_token"`
 	FacebookToken string        `bson:"facebook_token"`
 	PasswordHash  string        `bson:"password_hash"`
@@ -22,6 +22,8 @@ type User struct {
 	LoginCount   uint      `bson:"login_count"`
 }
 
+//REVIEW: #Issue 1 on Bitbucket in this module
+//TODO: Implement features for Google and Facebook login api's
 /*
 //NewUserGoogle : Function to create new user using Google Token.
 func NewUserGoogle(name, email, googleToken string, phoneNumber int64) *User {
@@ -55,7 +57,7 @@ func NewUserFacebook(name, email, facebookToken string, phoneNumber int64) *User
 */
 
 //NewUser : Function to create new user for normal signup
-func NewUser(name, email, passwordHash string, phoneNumber int64) *User {
+func NewUser(name, email, passwordHash, phoneNumber string) *User {
 	return &User{
 		ID:           bson.NewObjectId(),
 		Name:         name,
@@ -79,8 +81,8 @@ func (*User) Coll(db *mgo.Database) *mgo.Collection {
 	return db.C("user")
 }
 
-//Save : Function to save user in
+//Save : Function to save user in db
 func (u *User) Save(db *mgo.Database) error {
-	_, err := u.Coll(db).UpsertId(u.ID, u)
+	err := u.Coll(db).Insert(u)
 	return err
 }

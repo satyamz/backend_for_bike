@@ -4,8 +4,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/satyamz/Bike/models"
 	"github.com/satyamz/Bike/utils"
-	"gopkg.in/mgo.v2"
-	"net/http"
+	// "gopkg.in/mgo.v2"
+	// "net/http"
 )
 
 /*AccountController : Structure to bind
@@ -39,11 +39,13 @@ func (ac *AccountController) signup(c *gin.Context) {
 	userPhoneNumber := c.PostForm("phone")
 	userPasswordHash := c.PostForm("password")
 	user := models.NewUser(userName, userEmail, userPasswordHash, userPhoneNumber)
-	err := user.Save(db)
-	if err != nil {
-		c.JSON(http.StatusConflict, gin.H{
-			"status":  "Email Exists",
-			"message": err,
-		})
-	}
+	user.Save(db)
+	/*	if err != nil {
+			c.JSON(http.StatusConflict, gin.H{
+				"status":  "Email Exists",
+				"message": err,
+			})
+
+		}
+	*/
 }
