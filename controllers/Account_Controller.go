@@ -5,7 +5,7 @@ import (
 	"github.com/satyamz/Bike/models"
 	"github.com/satyamz/Bike/utils"
 	// "gopkg.in/mgo.v2"
-	// "net/http"
+	"net/http"
 )
 
 /*AccountController : Structure to bind
@@ -28,6 +28,8 @@ func NewAccountController(dba utils.DatabaseAccessor, cua utils.CurrentUserAcces
 //Register : Function to register router for AccountController
 func (ac *AccountController) Register(router *gin.Engine) {
 	router.POST("/signup", ac.signup)
+	router.POST("/login", ac.login)
+
 }
 
 //FindOrCreateUser : While signing up
@@ -40,13 +42,39 @@ func (ac *AccountController) signup(c *gin.Context) {
 	userPhoneNumber := c.PostForm("phone")
 	userPasswordHash := c.PostForm("password")
 	user := models.NewUser(userName, userEmail, userPasswordHash, userPhoneNumber)
-	user.Save(db)
-	/*	if err != nil {
-			c.JSON(http.StatusConflict, gin.H{
-				"status":  "Email Exists",
-				"message": err,
-			})
+	err := user.Save(db)
+	if err != nil {
+		c.JSON(http.StatusConflict, gin.H{
+			"status":  "Email Exists",
+			"message": err,
+		})
 
-		}
+	}
+
+}
+
+//login : Login utility
+func (ac *AccountController) login(c *gin.Context) {
+	db := ac.database.Givedb()
+	userEmail := c.PostForm("user_email")
+	userPassword := c.PostForm("user_password")
+	user := models.User{Email: userEmail, PasswordHash: userPassword}
+	err := user.FindByEmail(userEmail, userPassword, db)
+	c.JSON(http.StatusConflict, gin.H{
+		"status":  "ok",
+		"message": err})
+	/*
+		    if err != nil {
+				c.JSON(http.StatusConflict, gin.H{
+					"status":  "Email Exists",
+					"message": err,
+				})
+
+			} else {
+				c.JSON(http.StatusNotFound, gin.H{
+					"status":  "Email not exists",
+					"message": "Please sign up",
+				})
+			}
 	*/
 }

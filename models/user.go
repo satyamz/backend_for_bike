@@ -72,8 +72,8 @@ func NewUser(name, email, passwordHash, phoneNumber string) *User {
 }
 
 //FindByEmail : To find user by email.
-func (u *User) FindByEmail(email string, db *mgo.Database) error {
-	return u.coll(db).Find(bson.M{"email": email}).One(u)
+func (u *User) FindByEmail(email, passwordHash string, db *mgo.Database) error {
+	return u.coll(db).Find(bson.M{"email": email, "password_hash": passwordHash}).One(u)
 }
 
 //Coll : Returns Collection
@@ -83,9 +83,7 @@ func (*User) coll(db *mgo.Database) *mgo.Collection {
 }
 
 //Save : Function to save user in db
-func (u *User) Save(db *mgo.Database) {
+func (u *User) Save(db *mgo.Database) error {
 	err := u.coll(db).Insert(u)
-	if err != nil {
-		panic(err)
-	}
+	return err
 }

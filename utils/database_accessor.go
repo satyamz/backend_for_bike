@@ -22,7 +22,17 @@ func NewDatabaseAccessor(url, name, key string) *DatabaseAccessor {
 	if err != nil {
 		panic(err)
 	}
-	// session.DB(name).C("user").EnsureIndex(mgo.Index{Key: []string{"user_email", "user_phone"}})
+
+	//TODO: Implement Method to add unique index on user_email and user_phone.
+	//REVIEW: Using manually db.user.createIndex({"user_email" : 1 , "user_phone" : 1},{ unique : true})
+
+	/*
+		index := mgo.Index{
+			Key:    []string{"user_email", "user_phone"},
+			Unique: true,
+		}
+		 session.DB(name).C("user").EnsureIndex(index)
+	*/
 	return &DatabaseAccessor{session, url, name, key}
 }
 

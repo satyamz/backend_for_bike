@@ -19,6 +19,8 @@ func NewServer(dba utils.DatabaseAccessor, cua utils.CurrentUserAccessor) *gin.E
 
 	accountController := controllers.NewAccountController(dba, cua)
 	accountController.Register(router)
+	storeController := controllers.NewStoreMapController(dba, cua)
+	storeController.Register(router)
 
 	return router
 }
