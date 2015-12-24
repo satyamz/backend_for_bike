@@ -1,5 +1,5 @@
 # Bike Project #
-This repository consist of Bike Project backend source.
+This repository consists of Bike Project backend source.
 
 
 ### What is this repository for? ###
@@ -7,6 +7,6 @@ This repository consist of Bike Project backend source.
 * Backend repository 
 
 ### Contribution guidelines ###
-
+* Create folder satyamz and then clone this repo in it.
 * Create your separate branch and generate PL.
-* You can also mail me patch. For that please use "git format-patch" command.
+* You can also mail me a patch. For that please use "git format-patch" command.
