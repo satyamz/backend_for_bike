@@ -24,8 +24,9 @@ func NewStoreMapController(dba utils.DatabaseAccessor, cua utils.CurrentUserAcce
 
 //Register : Function to register router for Map_controller
 func (sm *StoreMapController) Register(router *gin.Engine) {
-	router.GET("/find_store", sm.FindBikesInStore)
+	router.GET("/find_bikes_store", sm.FindBikesInStore)
 	router.POST("/add_store", sm.AddStore)
+	router.GET("/find_nearby_store", sm.FindNearByStore)
 
 }
 
@@ -61,4 +62,19 @@ func (sm *StoreMapController) AddStore(c *gin.Context) {
 		panic(err)
 	}
 
+}
+
+//FindNearByStore : Function to find nearby store.
+func (sm *StoreMapController) FindNearByStore(c *gin.Context) {
+	db := sm.database.Givedb()
+	userLocation := make([]float64, 2)
+	userLocation[0], _ = strconv.ParseFloat(c.Query("long"), 32)
+	userLocation[1], _ = strconv.ParseFloat(c.Query("lat"), 32)
+	log.Println(userLocation)
+	store := models.NewStore(" ", userLocation, 1)
+	result := store.FindNearByStore(db)
+	log.Println(result)
+	c.JSON(200, gin.H{
+		"Result": result,
+	})
 }

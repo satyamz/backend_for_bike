@@ -3,6 +3,7 @@ package models
 import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"log"
 )
 
 //TODO: write models for store and map
@@ -13,6 +14,11 @@ type StoreMap struct {
 	StoreName            string        `bson:"store_name"`
 	StoreLocation        []float64     `bson:"store_loc"`
 	NumberOfBikesPresent int           `bson:"bike_count"`
+}
+
+//UserLocation : Struct to store user location
+type UserLocation struct {
+	userLocation []float64
 }
 
 //NewStore : Returns StoreMap
@@ -38,4 +44,23 @@ func (sm *StoreMap) CheckBikeAvailiblityAtStore(db *mgo.Database) {
 func (sm *StoreMap) coll(db *mgo.Database) *mgo.Collection {
 	collection := db.C("store")
 	return collection
+}
+
+//FindNearByStore : Function to write query of find_nearby_store
+func (sm *StoreMap) FindNearByStore(db *mgo.Database) StoreMap {
+	var result StoreMap
+	pipeline := bson.M{
+		"store_loc": bson.M{
+			"$near": []interface{}{
+				sm.StoreLocation[0], sm.StoreLocation[1],
+			},
+			"$maxDistance": 1,
+		},
+	}
+	log.Println(pipeline)
+	err := sm.coll(db).Find(pipeline).One(&result)
+	if err != nil {
+		panic(err)
+	}
+	return result
 }
