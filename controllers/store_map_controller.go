@@ -53,15 +53,19 @@ func (sm *StoreMapController) AddStore(c *gin.Context) {
 	storeLocation := make([]float64, 2)
 	storeName := c.PostForm("store_name")
 
-	storeLocation[0], _ = strconv.ParseFloat(c.PostForm("store_lat"), 32)
-	storeLocation[1], _ = strconv.ParseFloat(c.PostForm("store_long"), 32)
+	storeLocation[0], _ = strconv.ParseFloat(c.PostForm("store_long"), 32)
+	storeLocation[1], _ = strconv.ParseFloat(c.PostForm("store_lat"), 32)
 	NumberOfBikesPresent, _ := strconv.Atoi(c.PostForm("bikes_present"))
 	Store := models.NewStore(storeName, storeLocation, NumberOfBikesPresent)
 	err := Store.Save(db)
 	if err != nil {
 		panic(err)
+	} else {
+		c.JSON(200, gin.H{
+			"status": "ok",
+			"store":  Store,
+		})
 	}
-
 }
 
 //FindNearByStore : Function to find nearby store.
@@ -72,9 +76,34 @@ func (sm *StoreMapController) FindNearByStore(c *gin.Context) {
 	userLocation[1], _ = strconv.ParseFloat(c.Query("lat"), 32)
 	log.Println(userLocation)
 	store := models.NewStore(" ", userLocation, 1)
-	result := store.FindNearByStore(db)
-	log.Println(result)
-	c.JSON(200, gin.H{
-		"Result": result,
-	})
+	result, err := store.FindNearByStore(db)
+	log.Println(result, err)
+	if err != nil {
+		c.JSON(400, gin.H{
+			"status":  "Not Found",
+			"message": "No nearby stores available",
+		})
+	} else {
+		StoreID := result.StoreID.Hex()
+		if result.NumberOfBikesPresent == 0 {
+			c.JSON(200, gin.H{
+				"message": "No bikes available in your nearby store",
+			})
+			/*
+				Redirect user somewhere
+				OR Write code to find next nearby store. And proceed further.
+			*/
+		}
+		log.Println(StoreID)
+		utils.StartRabbitMq(StoreID)
+		/*
+			Handle the error produced by above call.
+		*/
+		c.JSON(200, gin.H{
+			"message": "Request for bike has been placed at",
+			"store":   result.StoreName,
+		})
+
+	}
+
 }

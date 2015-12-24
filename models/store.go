@@ -47,7 +47,7 @@ func (sm *StoreMap) coll(db *mgo.Database) *mgo.Collection {
 }
 
 //FindNearByStore : Function to write query of find_nearby_store
-func (sm *StoreMap) FindNearByStore(db *mgo.Database) StoreMap {
+func (sm *StoreMap) FindNearByStore(db *mgo.Database) (StoreMap, error) {
 	var result StoreMap
 	pipeline := bson.M{
 		"store_loc": bson.M{
@@ -60,7 +60,7 @@ func (sm *StoreMap) FindNearByStore(db *mgo.Database) StoreMap {
 	log.Println(pipeline)
 	err := sm.coll(db).Find(pipeline).One(&result)
 	if err != nil {
-		panic(err)
+		log.Println(err)
 	}
-	return result
+	return result, err
 }

@@ -5,6 +5,7 @@ import (
 	"github.com/satyamz/Bike/models"
 	"github.com/satyamz/Bike/utils"
 	// "gopkg.in/mgo.v2"
+	"log"
 	"net/http"
 )
 
@@ -37,10 +38,11 @@ func (ac *AccountController) signup(c *gin.Context) {
 	// user := new(models.User)
 	// db := ac.database.Get(c)
 	db := ac.database.Givedb()
-	userName := c.PostForm("name")
-	userEmail := c.PostForm("email")
-	userPhoneNumber := c.PostForm("phone")
-	userPasswordHash := c.PostForm("password")
+	userName := c.PostForm("NAME")
+	userEmail := c.PostForm("EMAIL")
+	userPhoneNumber := c.PostForm("MOB_NO")
+	userPasswordHash := c.PostForm("PASSWORD")
+	log.Printf("%s\t%s\t%s\t%s\n", userName, userEmail, userPhoneNumber, userPasswordHash)
 	user := models.NewUser(userName, userEmail, userPasswordHash, userPhoneNumber)
 	err := user.Save(db)
 	if err != nil {
