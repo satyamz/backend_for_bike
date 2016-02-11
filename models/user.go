@@ -3,23 +3,28 @@ package models
 import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	// "log"
 	"time"
 )
 
 //User : struct to keep user data
 type User struct {
 	//Identification Information
-	ID            bson.ObjectId `bson:"_id,omitempty"`
-	Name          string        `bson:"user_name"`
-	Email         string        `bson:"user_email"`
-	PhoneNumber   string        `bson:"phone_number"`
-	GoogleToken   string        `bson:"google_token"`
-	FacebookToken string        `bson:"facebook_token"`
-	PasswordHash  string        `bson:"password_hash"`
+	ID          bson.ObjectId `bson:"_id,omitempty"`
+	Name        string        `bson:"user_name" json:"user_name"`
+	Email       string        `bson:"user_email" json:"user_email"`
+	PhoneNumber string        `bson:"phone_number" json:"phone_number"`
+	// GoogleToken   string        `bson:"google_token" `
+	// FacebookToken string        `bson:"facebook_token"`
+	PasswordHash string `bson:"password_hash" json:"password_hash"`
 	//Analytics Information
-	SignUpDate   time.Time `bson:"signup_date"`
-	LastLoggedIn time.Time `bson:"last_login"`
-	LoginCount   uint      `bson:"login_count"`
+	SignUpDate   time.Time `bson:"signup_date" json:"signup_date"`
+	LastLoggedIn time.Time `bson:"last_login" json:"last_login"`
+	LoginCount   uint      `bson:"login_count" json:"login_count"`
+}
+type UserLogin struct {
+	Email    string `bson:"user_email" json:"user_email"`
+	Password string `bson:"password_hash" json:"password_hash"`
 }
 
 //REVIEW: #Issue 1 on Bitbucket in this module
@@ -72,8 +77,12 @@ func NewUser(name, email, passwordHash, phoneNumber string) *User {
 }
 
 //FindByEmail : To find user by email.
-func (u *User) FindByEmail(email, passwordHash string, db *mgo.Database) error {
-	return u.coll(db).Find(bson.M{"email": email, "password_hash": passwordHash}).One(u)
+func (u *User) FindByEmail(email string, db *mgo.Database) (error, *User) {
+	Result := new(User)
+	err := u.coll(db).Find(bson.M{"user_email": email}).One(&Result)
+	// log.Println("-->")
+	return err, Result
+
 }
 
 //Coll : Returns Collection

@@ -1,10 +1,10 @@
 package controllers
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/satyamz/Bike/models"
 	"github.com/satyamz/Bike/utils"
-	// "gopkg.in/mgo.v2"
 	"log"
 	"net/http"
 )
@@ -35,15 +35,17 @@ func (ac *AccountController) Register(router *gin.Engine) {
 
 //FindOrCreateUser : While signing up
 func (ac *AccountController) signup(c *gin.Context) {
-	// user := new(models.User)
+	user := new(models.User)
 	// db := ac.database.Get(c)
 	db := ac.database.Givedb()
-	userName := c.PostForm("NAME")
-	userEmail := c.PostForm("EMAIL")
-	userPhoneNumber := c.PostForm("MOB_NO")
-	userPasswordHash := c.PostForm("PASSWORD")
-	log.Printf("%s\t%s\t%s\t%s\n", userName, userEmail, userPhoneNumber, userPasswordHash)
-	user := models.NewUser(userName, userEmail, userPasswordHash, userPhoneNumber)
+	// userName := c.PostForm("NAME")
+	// userEmail := c.PostForm("EMAIL")
+	// userPhoneNumber := c.PostForm("MOB_NO")
+	// userPasswordHash := c.PostForm("PASSWORD")
+	// log.Printf("%s\t%s\t%s\t%s\n", userName, userEmail, userPhoneNumber, userPasswordHash)
+	// user := models.NewUser(userName, userEmail, userPasswordHash, userPhoneNumber)
+	c.Bind(&user)
+	log.Println(user)
 	err := user.Save(db)
 	if err != nil {
 		c.JSON(http.StatusConflict, gin.H{
@@ -55,28 +57,35 @@ func (ac *AccountController) signup(c *gin.Context) {
 
 }
 
-//login : Login utility
+//login : Login utility function
 func (ac *AccountController) login(c *gin.Context) {
 	db := ac.database.Givedb()
-	userEmail := c.PostForm("user_email")
-	userPassword := c.PostForm("user_password")
-	user := models.User{Email: userEmail, PasswordHash: userPassword}
-	err := user.FindByEmail(userEmail, userPassword, db)
-	c.JSON(http.StatusConflict, gin.H{
-		"status":  "ok",
-		"message": err})
-	/*
-		    if err != nil {
-				c.JSON(http.StatusConflict, gin.H{
-					"status":  "Email Exists",
-					"message": err,
-				})
+	user := models.User{}
+	c.Bind(&user)
+	err, Result := user.FindByEmail(user.Email, db)
 
-			} else {
-				c.JSON(http.StatusNotFound, gin.H{
-					"status":  "Email not exists",
-					"message": "Please sign up",
-				})
-			}
-	*/
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{
+			"flag":    "0",
+			"status":  "Email not found",
+			"message": "Please check email address",
+			"Error":   err,
+		})
+	} else {
+		if user.PasswordHash == Result.PasswordHash {
+
+			c.JSON(http.StatusOK, gin.H{
+				"flag":   "1",
+				"status": "ok",
+			})
+		} else {
+			fmt.Println("Password error")
+			c.JSON(http.StatusOK, gin.H{
+				"flag":    "0",
+				"status":  "Password is wrong",
+				"message": "Please check message",
+			})
+		}
+	}
+
 }
