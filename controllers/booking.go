@@ -1,7 +1,7 @@
 package controllers
 
-/*
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/satyamz/Bike/models"
 	"github.com/satyamz/Bike/utils"
@@ -23,11 +23,28 @@ func NewBookingController(dba utils.DatabaseAccessor, cua utils.CurrentUserAcces
 
 //Register : Function to register router.
 func (bc *BookingController) Register(router *gin.Engine) {
-	router.POST("/book/stop", RideStop)
+	router.POST("/confirm_ride", bc.RideConfirm)
 }
 
-//RideStop : To stop ride.
-func (bc *BookingController) RideStop(c *gin.Context) {
+//RideConfirm : Function to confirm the ride(S.M will confirm ride)
+func (bc *BookingController) RideConfirm(c *gin.Context) {
+	db := bc.database.Givedb()
+	ConfirmRideInstance := new(models.Ride)
+	c.Bind(&ConfirmRideInstance)
+	err := ConfirmRideInstance.ConfirmRide(db)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"status": "Failure",
+		})
+		panic(err)
+	} else {
+		c.JSON(200, gin.H{
+			"status":  "ok",
+			"message": "confirmed",
+		})
+	}
+	c.Bind(&ConfirmRideInstance)
+	fmt.Println(ConfirmRideInstance)
+	c.JSON(200, ConfirmRideInstance)
 
 }
-*/

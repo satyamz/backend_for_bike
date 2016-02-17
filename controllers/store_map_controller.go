@@ -25,8 +25,8 @@ func NewStoreMapController(dba utils.DatabaseAccessor, cua utils.CurrentUserAcce
 //Register : Function to register router for Map_controller
 func (sm *StoreMapController) Register(router *gin.Engine) {
 	router.GET("/find_bikes_store", sm.FindBikesInStore)
-	router.POST("/add_store", sm.AddStore)
-	router.GET("/find_nearby_store", sm.FindNearByStore)
+	// router.POST("/add_store", sm.AddStore)
+	router.POST("/find_nearby_store", sm.FindNearByStore)
 
 }
 
@@ -47,6 +47,7 @@ func (sm *StoreMapController) FindBikesInStore(c *gin.Context) {
 	log.Println(storeLocation)
 }
 
+/*
 //AddStore : add new store
 func (sm *StoreMapController) AddStore(c *gin.Context) {
 	db := sm.database.Givedb()
@@ -67,14 +68,13 @@ func (sm *StoreMapController) AddStore(c *gin.Context) {
 		})
 	}
 }
-
+*/
 //FindNearByStore : Function to find nearby store.
 func (sm *StoreMapController) FindNearByStore(c *gin.Context) {
 	db := sm.database.Givedb()
-	userLocation := make([]float64, 2)
-	userLocation[0], _ = strconv.ParseFloat(c.Query("long"), 32)
-	userLocation[1], _ = strconv.ParseFloat(c.Query("lat"), 32)
-	log.Println(userLocation)
+	userLocation := new(models.UserLocation)
+	c.Bind(&userLocation)
+	log.Println("Coordinates --->", userLocation)
 	store := models.NewStore(" ", userLocation, 1)
 	result, err := store.FindNearByStore(db)
 	log.Println(result, err)
@@ -84,7 +84,7 @@ func (sm *StoreMapController) FindNearByStore(c *gin.Context) {
 			"message": "No nearby stores available",
 		})
 	} else {
-		StoreID := result.StoreID.Hex()
+
 		if result.NumberOfBikesPresent == 0 {
 			c.JSON(200, gin.H{
 				"message": "No bikes available in your nearby store",
@@ -94,8 +94,8 @@ func (sm *StoreMapController) FindNearByStore(c *gin.Context) {
 				OR Write code to find next nearby store. And proceed further.
 			*/
 		}
-		log.Println(StoreID)
-		utils.StartRabbitMq(StoreID)
+		log.Println(result)
+		utils.StartRabbitMq(result)
 		/*
 			Handle the error produced by above call.
 		*/

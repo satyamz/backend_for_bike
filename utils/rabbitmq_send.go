@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"encoding/json"
 	"fmt"
+	"github.com/satyamz/Bike/models"
 	"github.com/streadway/amqp"
 	"log"
 )
@@ -14,7 +16,7 @@ func failOnError(err error, msg string) {
 }
 
 //StartRabbitMq : Function to start RabbitMQ service
-func StartRabbitMq(StoreID string) {
+func StartRabbitMq(Result models.StoreMap) {
 
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
@@ -33,7 +35,7 @@ func StartRabbitMq(StoreID string) {
 			nil,      // arguments
 		)
 	*/
-	QueueName := StoreID
+	QueueName := Result.StoreID.Hex()
 	q, err := ch.QueueDeclare(
 		QueueName, // name
 		false,     // durable
@@ -45,8 +47,8 @@ func StartRabbitMq(StoreID string) {
 
 	failOnError(err, "Failed to declare a queue")
 
-	body := "Requesting new bike"
-
+	json.Marshal(Result)
+	body := ""
 	err = ch.Publish(
 		"",     // exchange
 		q.Name, // routing key

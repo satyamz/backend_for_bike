@@ -22,6 +22,8 @@ type User struct {
 	LastLoggedIn time.Time `bson:"last_login" json:"last_login"`
 	LoginCount   uint      `bson:"login_count" json:"login_count"`
 }
+
+//UserLogin : Struct for user login
 type UserLogin struct {
 	Email    string `bson:"user_email" json:"user_email"`
 	Password string `bson:"password_hash" json:"password_hash"`
