@@ -64,13 +64,13 @@ func NewUserFacebook(name, email, facebookToken string, phoneNumber int64) *User
 */
 
 //NewUser : Function to create new user for normal signup
-func NewUser(name, email, passwordHash, phoneNumber string) *User {
+func NewUser(u *User) *User {
 	return &User{
 		ID:           bson.NewObjectId(),
-		Name:         name,
-		Email:        email,
-		PasswordHash: passwordHash,
-		PhoneNumber:  phoneNumber,
+		Name:         u.Name,
+		Email:        u.Email,
+		PasswordHash: u.PasswordHash,
+		PhoneNumber:  u.PhoneNumber,
 		SignUpDate:   time.Now(),
 		LastLoggedIn: time.Now(),
 		LoginCount:   1,

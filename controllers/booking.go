@@ -31,20 +31,24 @@ func (bc *BookingController) RideConfirm(c *gin.Context) {
 	db := bc.database.Givedb()
 	ConfirmRideInstance := new(models.Ride)
 	c.Bind(&ConfirmRideInstance)
-	err := ConfirmRideInstance.ConfirmRide(db)
+	RideInstance := models.NewRide(ConfirmRideInstance)
+	fmt.Println(*RideInstance)
+	// c.Bind(&RideInstance)
+	err := RideInstance.ConfirmRide(db)
 	if err != nil {
 		c.JSON(500, gin.H{
 			"status": "Failure",
 		})
-		panic(err)
+		// panic(err)
+		fmt.Println(err)
 	} else {
 		c.JSON(200, gin.H{
 			"status":  "ok",
 			"message": "confirmed",
 		})
 	}
-	c.Bind(&ConfirmRideInstance)
-	fmt.Println(ConfirmRideInstance)
-	c.JSON(200, ConfirmRideInstance)
+	// c.Bind(&ConfirmRideInstance)
+	fmt.Println(RideInstance)
+	// c.JSON(200, ConfirmRideInstance)
 
 }

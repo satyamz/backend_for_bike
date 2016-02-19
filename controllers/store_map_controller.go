@@ -94,7 +94,7 @@ func (sm *StoreMapController) FindNearByStore(c *gin.Context) {
 				OR Write code to find next nearby store. And proceed further.
 			*/
 		}
-		log.Println(result)
+		// log.Println(result)
 		utils.StartRabbitMq(result)
 		/*
 			Handle the error produced by above call.

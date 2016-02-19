@@ -36,7 +36,8 @@ func (ac *AccountController) signup(c *gin.Context) {
 	user := new(models.User)
 	db := ac.database.Givedb()
 	c.Bind(&user)
-	err := user.Save(db)
+	userInstance := models.NewUser(user)
+	err := userInstance.Save(db)
 	if err != nil {
 		c.JSON(http.StatusConflict, gin.H{
 			"status":  "Email Exists",
