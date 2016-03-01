@@ -10,12 +10,10 @@ import (
 
 //StoreMap : Structure to create custom store datatype
 type StoreMap struct {
-	StoreID   bson.ObjectId `bson:"_id,omitempty"`
-	StoreName string        `bson:"store_name"`
-	StoreLong float64       `bson:"store_long"`
-	StoreLat  float64       `bson:"store_lat"`
-
-	NumberOfBikesPresent int `bson:"bike_count"`
+	StoreID              bson.ObjectId `bson:"_id,omitempty"`
+	StoreName            string        `bson:"store_name"`
+	StoreLoc             []float64     `bson:"store_loc"`
+	NumberOfBikesPresent int           `bson:"bike_count"`
 }
 
 //StoreAddNew : Struct to add new store
@@ -28,16 +26,14 @@ type StoreAddNew struct {
 
 //UserLocation : Struct to store user location
 type UserLocation struct {
-	UserLong float64 `json:"user_long"`
-	UserLat  float64 `json:"user_lat"`
+	UserLoc []float64 `json:"user_loc"`
 }
 
 //NewStore : Returns StoreMap
-func NewStore(StoreName string, userLocation *UserLocation, NoOfBikesPresent int) *StoreMap {
+func NewStore(StoreName string, userLocation []float64, NoOfBikesPresent int) *StoreMap {
 	return &StoreMap{
 		StoreName:            StoreName,
-		StoreLong:            userLocation.UserLong,
-		StoreLat:             userLocation.UserLat,
+		StoreLoc:             userLocation,
 		NumberOfBikesPresent: NoOfBikesPresent,
 	}
 }
@@ -74,9 +70,7 @@ func (sm *StoreMap) FindNearByStore(db *mgo.Database) (StoreMap, error) {
 	var result StoreMap
 	pipeline := bson.M{
 		"store_loc": bson.M{
-			"$near": []interface{}{
-				sm.StoreLong, sm.StoreLat,
-			},
+			"$near":        sm.StoreLoc,
 			"$maxDistance": 1,
 		},
 	}

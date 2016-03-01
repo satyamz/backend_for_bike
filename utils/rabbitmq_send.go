@@ -16,7 +16,7 @@ func failOnError(err error, msg string) {
 }
 
 //StartRabbitMq : Function to start RabbitMQ service
-func StartRabbitMq(Result models.StoreMap) {
+func StartRabbitMq(Result models.StoreMap, RideInstance *models.Ride) {
 
 	conn, err := amqp.Dial("amqp://guest:guest@localhost:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
@@ -25,6 +25,14 @@ func StartRabbitMq(Result models.StoreMap) {
 	ch, err := conn.Channel()
 	failOnError(err, "Failed to open a channel")
 	defer ch.Close()
+	/*
+		Retrive user Information and send to the store manager
+		User Information:
+		User name :
+		User Phone:
+		User Location:
+	*/
+	UserId := RideInstance.UserID
 	/*
 		q1, err := ch.QueueDeclare(
 			"hello1", // name
@@ -48,7 +56,7 @@ func StartRabbitMq(Result models.StoreMap) {
 	failOnError(err, "Failed to declare a queue")
 
 	json.Marshal(Result)
-	body := ""
+	body := UserId
 	err = ch.Publish(
 		"",     // exchange
 		q.Name, // routing key

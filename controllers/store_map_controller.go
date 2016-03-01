@@ -69,13 +69,16 @@ func (sm *StoreMapController) AddStore(c *gin.Context) {
 	}
 }
 */
-//FindNearByStore : Function to find nearby store.
+
+/*FindNearByStore : Function to find nearby store.
+User search for availibilty of ride. Only user location is needed.
+*/
 func (sm *StoreMapController) FindNearByStore(c *gin.Context) {
 	db := sm.database.Givedb()
 	userLocation := new(models.UserLocation)
 	c.Bind(&userLocation)
 	log.Println("Coordinates --->", userLocation)
-	store := models.NewStore(" ", userLocation, 1)
+	store := models.NewStore(" ", userLocation.UserLoc, 1)
 	result, err := store.FindNearByStore(db)
 	log.Println(result, err)
 	if err != nil {
@@ -87,22 +90,32 @@ func (sm *StoreMapController) FindNearByStore(c *gin.Context) {
 
 		if result.NumberOfBikesPresent == 0 {
 			c.JSON(200, gin.H{
+				"status":  "Not found",
 				"message": "No bikes available in your nearby store",
 			})
+
 			/*
 				Redirect user somewhere
 				OR Write code to find next nearby store. And proceed further.
 			*/
+		} else {
+			c.JSON(200, gin.H{
+				"status":  "Ok",
+				"message": "Bike is available",
+			})
 		}
+
 		// log.Println(result)
-		utils.StartRabbitMq(result)
+		//utils.StartRabbitMq(result)
 		/*
 			Handle the error produced by above call.
 		*/
-		c.JSON(200, gin.H{
+
+		/*c.JSON(200, gin.H{
 			"message": "Request for bike has been placed at",
 			"store":   result.StoreName,
 		})
+		*/
 
 	}
 
