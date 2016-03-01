@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":1,"key":{"_id":1},"name":"_id_","ns":"App.user"},{"v":1,"unique":true,"key":{"user_email":1.0,"user_phone":1.0},"name":"user_email_1_user_phone_1","ns":"App.user"}]}
