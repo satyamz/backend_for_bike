@@ -35,6 +35,11 @@ func NewRide(r *Ride) *Ride {
 	}
 }
 
+//NewStartRide : Function to instantiate StartRide instance.
+func NewStartRide(r *Ride) *Ride {
+	return &Ride{}
+}
+
 //ConfirmRide : Function to confirm ride.
 func (ride *Ride) ConfirmRide(db *mgo.Database) error {
 	fmt.Println(ride)

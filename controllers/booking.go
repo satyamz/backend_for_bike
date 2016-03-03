@@ -31,6 +31,7 @@ func NewBookingController(dba utils.DatabaseAccessor, cua utils.CurrentUserAcces
 //Register : Function to register router.
 func (bc *BookingController) Register(router *gin.Engine) {
 	router.POST("/confirm_ride", bc.RideConfirm)
+	router.POST("/start_ride", bc.StartRide)
 }
 
 /*RideConfirm : When user Asks for delivery RideConfirm fuction will take inputs
@@ -90,5 +91,14 @@ func (bc *BookingController) RideConfirm(c *gin.Context) {
 	// c.Bind(&ConfirmRideInstance)
 	// fmt.Println(RideInstance)
 	// c.JSON(200, ConfirmRideInstance)
+
+}
+
+//StartRide : Function to start ride
+func (bc *BookingController) StartRide(c *gin.Context) {
+	db := bc.database.Givedb()
+	StartRideInstance := new(models.Ride)
+	c.Bind(&StartRideInstance)
+	RideInstanceOnStart := models.NewRide(StartRideInstance)
 
 }

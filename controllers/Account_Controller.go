@@ -52,7 +52,7 @@ func (ac *AccountController) login(c *gin.Context) {
 	user := models.User{}
 	c.Bind(&user)
 	err, Result := user.FindByEmail(user.Email, db)
-
+	fmt.Println(Result)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{
 			"flag":    "0",
