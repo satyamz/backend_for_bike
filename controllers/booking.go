@@ -96,9 +96,9 @@ func (bc *BookingController) RideConfirm(c *gin.Context) {
 
 //StartRide : Function to start ride
 func (bc *BookingController) StartRide(c *gin.Context) {
-	db := bc.database.Givedb()
+	// db := bc.database.Givedb()
 	StartRideInstance := new(models.Ride)
 	c.Bind(&StartRideInstance)
-	RideInstanceOnStart := models.NewRide(StartRideInstance)
+	// RideInstanceOnStart := models.NewRide(StartRideInstance)
 
 }
