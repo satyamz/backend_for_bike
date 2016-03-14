@@ -104,17 +104,20 @@ func (bc *BookingController) StartRide(c *gin.Context) {
 	StartRideInstance := new(models.Ride)
 	c.Bind(&StartRideInstance)
 	RideInstanceOnStart := models.NewStartRide(StartRideInstance)
-	fmt.Println(*RideInstanceOnStart)
-	c.JSON(200, gin.H{
+	// fmt.Println(*RideInstanceOnStart)
+	/*c.JSON(200, gin.H{
 		"Ride Instance On Start": *RideInstanceOnStart,
-	})
+	})*/
 	err := RideInstanceOnStart.StartRide(db)
 
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(200, gin.H{"Error": "Error"})
+	} else {
+
+		//Implement RabbitMQ API for sending notification to user.
+		c.JSON(200, gin.H{"status": "Ride Started"})
 	}
-	c.JSON(200, gin.H{"status": "Ride Started"})
 }
 
 //StopRide : Function to stop ride from user -> Server.
