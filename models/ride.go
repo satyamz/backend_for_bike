@@ -15,7 +15,7 @@ type Ride struct {
 	RideID            bson.ObjectId `bson:"_id,omitempty"`
 	UserID            string        `bson:"user_id" json:"user_id"`
 	StoreManagerID    string        `bson:"sm_id" json:"sm_id"`
-	StoreManagerEndID string        `bson:"sm_id" json:"sm_end_id"`
+	StoreManagerEndID string        `bson:"sm_end_id" json:"sm_end_id"`
 
 	//Ride Start fields
 	ConfirmRideTime       time.Time `bson:"ride_confirm_time" json:"ride_confirm_time"`
@@ -32,7 +32,7 @@ type Ride struct {
 	UserRideEndTimeServer time.Time `bson:"ride_end_time_server" json:"end_time_server"`
 	RideEndReading        float64   `bson:"end_reading" json:"end_reading"`
 	RideEndReadingImage   string    `bson:"end_meter_image" json:"end_meter_image"`
-
+	RideFinishTime        time.Time `bson:"ride_finish_time" json:"ride_finish_time"`
 	//Ride Calculations
 	TotalDistanceTravelled float64   `bson:"total_distance" json:"total_distance"`
 	TotalTimeTravelled     time.Time `json:"total_time" json:"total_time"`
@@ -74,6 +74,16 @@ func NewStopRide(r *Ride) *Ride {
 	}
 }
 
+//NewEndRide : Function to save ride finish time
+//Add all other details such as end meter reading, meter image etc.
+func NewEndRide(r *Ride) *Ride {
+	return &Ride{
+		UserID:            r.UserID,
+		StoreManagerEndID: r.StoreManagerEndID,
+		RideFinishTime:    time.Now(),
+	}
+}
+
 //NewConfirmEndRide : Function to update
 func NewConfirmEndRide(r *Ride) *Ride {
 	return &Ride{}
@@ -99,6 +109,14 @@ func (ride *Ride) StopRide(db *mgo.Database) error {
 	UserIDToSearch := bson.M{"user_id": ride.UserID}
 	UpdateQuery := bson.M{"$set": bson.M{"end_user_loc": ride.EndUserLocation, "ride_end_time_server": ride.RideStartTimeOnServer, "ride_end_time": ride.RideEndTime}}
 	err := ride.coll(db).Update(UserIDToSearch, UpdateQuery)
+	return err
+}
+
+//RideEnd : Method to update db
+func (ride *Ride) RideEnd(db *mgo.Database) error {
+	QueryUser := bson.M{"user_id": ride.UserID}
+	UpdateQuery := bson.M{"$set": bson.M{"sm_end_id": ride.StoreManagerEndID, "ride_finish_time": ride.RideFinishTime}}
+	err := ride.coll(db).Update(QueryUser, UpdateQuery)
 	return err
 }
 

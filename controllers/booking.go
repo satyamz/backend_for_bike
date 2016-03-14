@@ -34,6 +34,7 @@ func (bc *BookingController) Register(router *gin.Engine) {
 	router.POST("/confirm_ride", bc.RideConfirm)
 	router.POST("/start_ride", bc.StartRide)
 	router.POST("/stop_ride", bc.StopRide)
+	router.POST("/finish_ride", bc.RideEnd)
 
 }
 
@@ -137,7 +138,6 @@ func (bc *BookingController) StopRide(c *gin.Context) {
 			"status": "Ride stop request confirmed",
 		})
 	}
-
 }
 
 //ConfirmEndRide : Function to confirm end of ride form SM.
@@ -145,5 +145,25 @@ func (bc *BookingController) StopRide(c *gin.Context) {
 func (bc *BookingController) ConfirmEndRide(c *gin.Context) {
 	ConfirmEndRideInstance := new(models.Ride)
 	c.Bind(&ConfirmEndRideInstance)
+
+}
+
+//RideEnd : Function to finish ride.
+//Main function of this utility is to take ride end data and build
+func (bc *BookingController) RideEnd(c *gin.Context) {
+	db := bc.database.Givedb()
+	RideEndInstance := new(models.Ride)
+	c.Bind(&RideEndInstance)
+	RideFinish := models.NewEndRide(RideEndInstance)
+	err := RideFinish.RideEnd(db) //Update fields
+	if err != nil {
+		c.JSON(200, gin.H{
+			"Status": "Error occured",
+		})
+	} else {
+		c.JSON(200, gin.H{
+			"Status": "Ride end",
+		})
+	}
 
 }
