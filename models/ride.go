@@ -37,7 +37,13 @@ func NewRide(r *Ride) *Ride {
 
 //NewStartRide : Function to instantiate StartRide instance.
 func NewStartRide(r *Ride) *Ride {
-	return &Ride{}
+	return &Ride{
+		UserID:            r.UserID,
+		StoreManagerID:    r.StoreManagerID,
+		StartUserLocation: r.StartUserLocation,
+		RideStartTime:     r.RideStartTime,
+		RideStartReading:  r.RideStartReading,
+	}
 }
 
 //ConfirmRide : Function to confirm ride.

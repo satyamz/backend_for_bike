@@ -43,7 +43,7 @@ func StartRabbitMq(Result models.StoreMap, RideInstance *models.Ride) {
 			nil,      // arguments
 		)
 	*/
-	QueueName := Result.StoreID.Hex()
+	QueueName := Result.StoreID.Hex() //Store manager
 	q, err := ch.QueueDeclare(
 		QueueName, // name
 		false,     // durable

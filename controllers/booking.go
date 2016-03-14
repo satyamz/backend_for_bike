@@ -99,6 +99,7 @@ func (bc *BookingController) StartRide(c *gin.Context) {
 	// db := bc.database.Givedb()
 	StartRideInstance := new(models.Ride)
 	c.Bind(&StartRideInstance)
-	// RideInstanceOnStart := models.NewRide(StartRideInstance)
+	RideInstanceOnStart := models.NewStartRide(StartRideInstance)
+	fmt.Println(RideInstanceOnStart)
 
 }
