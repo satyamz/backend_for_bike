@@ -9,6 +9,7 @@ package controllers
 
 import (
 	"fmt"
+
 	"github.com/gin-gonic/gin"
 	"github.com/satyamz/Bike/models"
 	"github.com/satyamz/Bike/utils"
@@ -32,6 +33,8 @@ func NewBookingController(dba utils.DatabaseAccessor, cua utils.CurrentUserAcces
 func (bc *BookingController) Register(router *gin.Engine) {
 	router.POST("/confirm_ride", bc.RideConfirm)
 	router.POST("/start_ride", bc.StartRide)
+	router.POST("/stop_ride", bc.StopRide)
+
 }
 
 /*RideConfirm : When user Asks for delivery RideConfirm fuction will take inputs
@@ -95,11 +98,33 @@ func (bc *BookingController) RideConfirm(c *gin.Context) {
 }
 
 //StartRide : Function to start ride
+// TODO: Update database, Think more on maintaining RideID
 func (bc *BookingController) StartRide(c *gin.Context) {
 	// db := bc.database.Givedb()
 	StartRideInstance := new(models.Ride)
 	c.Bind(&StartRideInstance)
 	RideInstanceOnStart := models.NewStartRide(StartRideInstance)
-	fmt.Println(RideInstanceOnStart)
+	fmt.Println(*RideInstanceOnStart)
+	c.JSON(200, gin.H{
+		"Ride Instance On Start": *RideInstanceOnStart,
+	})
+}
+
+//StopRide : Function to stop ride from user -> Server.
+func (bc *BookingController) StopRide(c *gin.Context) {
+	StopRideInstance := new(models.Ride)
+	c.Bind(&StopRideInstance)
+	StopRideInstanceUpdateTime := models.NewStopRide(StopRideInstance)
+	fmt.Println(*StopRideInstanceUpdateTime)
+	c.JSON(200, gin.H{
+		"status": *StopRideInstanceUpdateTime,
+	})
+}
+
+//ConfirmEndRide : Function to confirm end of ride form SM.
+//Send notification to the user "Bike will be picked up by so and so SM.".
+func (bc *BookingController) ConfirmEndRide(c *gin.Context) {
+	ConfirmEndRideInstance := new(models.Ride)
+	c.Bind(&ConfirmEndRideInstance)
 
 }
