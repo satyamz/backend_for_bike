@@ -100,7 +100,7 @@ func (bc *BookingController) RideConfirm(c *gin.Context) {
 //StartRide : Function to start ride
 // TODO: Update database, Think more on maintaining RideID
 func (bc *BookingController) StartRide(c *gin.Context) {
-	// db := bc.database.Givedb()
+	db := bc.database.Givedb()
 	StartRideInstance := new(models.Ride)
 	c.Bind(&StartRideInstance)
 	RideInstanceOnStart := models.NewStartRide(StartRideInstance)
@@ -108,6 +108,13 @@ func (bc *BookingController) StartRide(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"Ride Instance On Start": *RideInstanceOnStart,
 	})
+	err := RideInstanceOnStart.StartRide(db)
+
+	if err != nil {
+		fmt.Println(err)
+		c.JSON(200, gin.H{"Error": "Error"})
+	}
+	c.JSON(200, gin.H{"status": "Ride Started"})
 }
 
 //StopRide : Function to stop ride from user -> Server.

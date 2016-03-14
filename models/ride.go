@@ -53,6 +53,7 @@ func NewStartRide(r *Ride) *Ride {
 	return &Ride{
 		StoreManagerID:        r.StoreManagerID,
 		UserID:                r.UserID,
+		StartUserLocation:     r.StartUserLocation,
 		RideStartTime:         r.RideStartTime,
 		RideStartReading:      r.RideStartReading,
 		RideStartReadingImage: r.RideStartReadingImage,
@@ -74,13 +75,21 @@ func NewStopRide(r *Ride) *Ride {
 
 //NewConfirmEndRide : Function to update
 func NewConfirmEndRide(r *Ride) *Ride {
-
+	return &Ride{}
 }
 
 //ConfirmRide : Function to confirm ride.
 func (ride *Ride) ConfirmRide(db *mgo.Database) error {
 	fmt.Println(ride)
 	err := ride.coll(db).Insert(ride)
+	return err
+}
+
+//StartRide : Function to update ride instance
+func (ride *Ride) StartRide(db *mgo.Database) error {
+	UserIDQuery := bson.M{"user_id": ride.UserID}
+	UpdateQuery := bson.M{"$set": bson.M{"sm_id": ride.StoreManagerID, "start_user_loc": ride.StartUserLocation, "ride_start_time": ride.RideStartTime, "start_reading": ride.RideStartReading, "start_meter_image": ride.RideStartReadingImage, "user_license_image": ride.UserLicenseImage, "ride_start_time_server": ride.RideStartTimeOnServer}}
+	err := ride.coll(db).Update(UserIDQuery, UpdateQuery)
 	return err
 }
 
