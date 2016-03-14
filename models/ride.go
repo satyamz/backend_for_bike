@@ -12,9 +12,10 @@ import (
 //Ride : Structure to bind ride Information together
 type Ride struct {
 	//Ride metadata fields
-	RideID         bson.ObjectId `bson:"_id,omitempty"`
-	UserID         string        `bson:"user_id" json:"user_id"`
-	StoreManagerID string        `bson:"sm_id" json:"sm_id"`
+	RideID            bson.ObjectId `bson:"_id,omitempty"`
+	UserID            string        `bson:"user_id" json:"user_id"`
+	StoreManagerID    string        `bson:"sm_id" json:"sm_id"`
+	StoreManagerEndID string        `bson:"sm_id" json:"sm_end_id"`
 
 	//Ride Start fields
 	ConfirmRideTime       time.Time `bson:"ride_confirm_time" json:"ride_confirm_time"`
@@ -90,6 +91,14 @@ func (ride *Ride) StartRide(db *mgo.Database) error {
 	UserIDQuery := bson.M{"user_id": ride.UserID}
 	UpdateQuery := bson.M{"$set": bson.M{"sm_id": ride.StoreManagerID, "start_user_loc": ride.StartUserLocation, "ride_start_time": ride.RideStartTime, "start_reading": ride.RideStartReading, "start_meter_image": ride.RideStartReadingImage, "user_license_image": ride.UserLicenseImage, "ride_start_time_server": ride.RideStartTimeOnServer}}
 	err := ride.coll(db).Update(UserIDQuery, UpdateQuery)
+	return err
+}
+
+//StopRide : function to stop ride
+func (ride *Ride) StopRide(db *mgo.Database) error {
+	UserIDToSearch := bson.M{"user_id": ride.UserID}
+	UpdateQuery := bson.M{"$set": bson.M{"end_user_loc": ride.EndUserLocation, "ride_end_time_server": ride.RideStartTimeOnServer, "ride_end_time": ride.RideEndTime}}
+	err := ride.coll(db).Update(UserIDToSearch, UpdateQuery)
 	return err
 }
 

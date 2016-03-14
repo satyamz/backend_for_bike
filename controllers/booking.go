@@ -122,13 +122,22 @@ func (bc *BookingController) StartRide(c *gin.Context) {
 
 //StopRide : Function to stop ride from user -> Server.
 func (bc *BookingController) StopRide(c *gin.Context) {
+	db := bc.database.Givedb()
 	StopRideInstance := new(models.Ride)
 	c.Bind(&StopRideInstance)
 	StopRideInstanceUpdateTime := models.NewStopRide(StopRideInstance)
 	fmt.Println(*StopRideInstanceUpdateTime)
-	c.JSON(200, gin.H{
-		"status": *StopRideInstanceUpdateTime,
-	})
+	err := StopRideInstanceUpdateTime.StopRide(db)
+	if err != nil {
+		c.JSON(200, gin.H{
+			"status": "Error",
+		})
+	} else {
+		c.JSON(200, gin.H{
+			"status": "Ride stop request confirmed",
+		})
+	}
+
 }
 
 //ConfirmEndRide : Function to confirm end of ride form SM.
