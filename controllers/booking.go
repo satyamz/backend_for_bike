@@ -59,7 +59,8 @@ func (bc *BookingController) RideConfirm(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(200, gin.H{
-			"status": "No nearby store available",
+			"status":  "No nearby store available",
+			"message": "Please try from other location",
 		})
 	} else {
 		if Result.NumberOfBikesPresent == 0 {
@@ -69,7 +70,6 @@ func (bc *BookingController) RideConfirm(c *gin.Context) {
 			})
 		} else {
 			//Send notification to the store
-
 			utils.StartRabbitMq(Result, ConfirmRideInstance)
 			ConfirmRideInstance.StoreManagerID = Result.StoreID.Hex()
 			RideInstance := models.NewRide(ConfirmRideInstance)
@@ -79,23 +79,16 @@ func (bc *BookingController) RideConfirm(c *gin.Context) {
 				c.JSON(500, gin.H{
 					"status": "Error while booking ride",
 				})
-				// panic(err)
 				fmt.Println(err)
-
 			} else {
 				c.JSON(200, gin.H{
+					//TODO: Send details about SM who is delivering bike.
 					"status":  "ok",
 					"message": "Ride confirmed",
 				})
 			}
 		}
 	}
-
-	// c.Bind(&RideInstance)
-	// c.Bind(&ConfirmRideInstance)
-	// fmt.Println(RideInstance)
-	// c.JSON(200, ConfirmRideInstance)
-
 }
 
 //StartRide : Function to start ride
@@ -105,19 +98,13 @@ func (bc *BookingController) StartRide(c *gin.Context) {
 	StartRideInstance := new(models.Ride)
 	c.Bind(&StartRideInstance)
 	RideInstanceOnStart := models.NewStartRide(StartRideInstance)
-	// fmt.Println(*RideInstanceOnStart)
-	/*c.JSON(200, gin.H{
-		"Ride Instance On Start": *RideInstanceOnStart,
-	})*/
 	err := RideInstanceOnStart.StartRide(db)
-
 	if err != nil {
 		fmt.Println(err)
 		c.JSON(200, gin.H{"Error": "Error"})
 	} else {
-
 		//Implement RabbitMQ API for sending notification to user.
-		c.JSON(200, gin.H{"status": "Ride Started"})
+		c.JSON(200, gin.H{"status": "Ride Started"}) // Response to SM.
 	}
 }
 
@@ -126,17 +113,29 @@ func (bc *BookingController) StopRide(c *gin.Context) {
 	db := bc.database.Givedb()
 	StopRideInstance := new(models.Ride)
 	c.Bind(&StopRideInstance)
-	StopRideInstanceUpdateTime := models.NewStopRide(StopRideInstance)
-	fmt.Println(*StopRideInstanceUpdateTime)
-	err := StopRideInstanceUpdateTime.StopRide(db)
+	EndStoreInstance := models.NewStore(" ", StopRideInstance.EndUserLocation, 1)
+	EndStoreResult, err := EndStoreInstance.FindNearByStore(db)
 	if err != nil {
 		c.JSON(200, gin.H{
-			"status": "Error",
+			"status":  "No nearby store available",
+			"message": "Please try from other location",
 		})
 	} else {
-		c.JSON(200, gin.H{
-			"status": "Ride stop request confirmed",
-		})
+		//TODO: Send request to EndStoreResult store manager may be GCM.
+		StopRideInstance.StoreManagerEndID = EndStoreResult.StoreID.Hex()
+		StopRideInstanceUpdateTime := models.NewStopRide(StopRideInstance)
+		fmt.Println(*StopRideInstanceUpdateTime)
+		err := StopRideInstanceUpdateTime.StopRide(db)
+		if err != nil {
+			c.JSON(200, gin.H{
+				"status": "Error",
+			})
+		} else {
+			c.JSON(200, gin.H{
+				"status":  "Ride stop request confirmed",
+				"message": "Please wait till store manager comes",
+			})
+		}
 	}
 }
 
@@ -165,5 +164,4 @@ func (bc *BookingController) RideEnd(c *gin.Context) {
 			"Status": "Ride end",
 		})
 	}
-
 }

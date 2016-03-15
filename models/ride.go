@@ -1,12 +1,10 @@
 package models
 
 import (
-	"gopkg.in/mgo.v2"
-	// "encoding/json"
 	"fmt"
-	"time"
-
+	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+	"time"
 )
 
 //Ride : Structure to bind ride Information together
@@ -69,6 +67,7 @@ func NewStopRide(r *Ride) *Ride {
 	return &Ride{
 		UserID:                r.UserID,
 		EndUserLocation:       r.EndUserLocation,
+		StoreManagerEndID:     r.StoreManagerEndID,
 		RideEndTime:           r.RideEndTime,
 		UserRideEndTimeServer: time.Now(),
 	}
@@ -98,16 +97,28 @@ func (ride *Ride) ConfirmRide(db *mgo.Database) error {
 
 //StartRide : Function to update ride instance
 func (ride *Ride) StartRide(db *mgo.Database) error {
-	UserIDQuery := bson.M{"user_id": ride.UserID}
-	UpdateQuery := bson.M{"$set": bson.M{"sm_id": ride.StoreManagerID, "start_user_loc": ride.StartUserLocation, "ride_start_time": ride.RideStartTime, "start_reading": ride.RideStartReading, "start_meter_image": ride.RideStartReadingImage, "user_license_image": ride.UserLicenseImage, "ride_start_time_server": ride.RideStartTimeOnServer}}
-	err := ride.coll(db).Update(UserIDQuery, UpdateQuery)
+	UserIDToSearch := bson.M{"user_id": ride.UserID}
+	UpdateQuery := bson.M{"$set": bson.M{
+		"sm_id":                  ride.StoreManagerID,
+		"start_user_loc":         ride.StartUserLocation,
+		"ride_start_time":        ride.RideStartTime,
+		"start_reading":          ride.RideStartReading,
+		"start_meter_image":      ride.RideStartReadingImage,
+		"user_license_image":     ride.UserLicenseImage,
+		"ride_start_time_server": ride.RideStartTimeOnServer,
+	}}
+	err := ride.coll(db).Update(UserIDToSearch, UpdateQuery)
 	return err
 }
 
-//StopRide : function to stop ride
+//StopRide : function to stop ride (Update db).
 func (ride *Ride) StopRide(db *mgo.Database) error {
 	UserIDToSearch := bson.M{"user_id": ride.UserID}
-	UpdateQuery := bson.M{"$set": bson.M{"end_user_loc": ride.EndUserLocation, "ride_end_time_server": ride.RideStartTimeOnServer, "ride_end_time": ride.RideEndTime}}
+	UpdateQuery := bson.M{"$set": bson.M{
+		"end_user_loc":         ride.EndUserLocation,
+		"ride_end_time_server": ride.RideStartTimeOnServer,
+		"ride_end_time":        ride.RideEndTime,
+	}}
 	err := ride.coll(db).Update(UserIDToSearch, UpdateQuery)
 	return err
 }
@@ -115,7 +126,10 @@ func (ride *Ride) StopRide(db *mgo.Database) error {
 //RideEnd : Method to update db
 func (ride *Ride) RideEnd(db *mgo.Database) error {
 	QueryUser := bson.M{"user_id": ride.UserID}
-	UpdateQuery := bson.M{"$set": bson.M{"sm_end_id": ride.StoreManagerEndID, "ride_finish_time": ride.RideFinishTime}}
+	UpdateQuery := bson.M{"$set": bson.M{
+		"sm_end_id":        ride.StoreManagerEndID,
+		"ride_finish_time": ride.RideFinishTime,
+	}}
 	err := ride.coll(db).Update(QueryUser, UpdateQuery)
 	return err
 }

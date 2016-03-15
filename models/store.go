@@ -6,8 +6,6 @@ import (
 	"log"
 )
 
-//TODO: write models for store and map
-
 //StoreMap : Structure to create custom store datatype
 type StoreMap struct {
 	StoreID              bson.ObjectId `bson:"_id,omitempty"`
